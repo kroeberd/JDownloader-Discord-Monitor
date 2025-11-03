@@ -1,3 +1,6 @@
+# Dockerfile für JDownloader-Discord-Monitor
+# Autor: kroeberd
+# Beschreibung: Docker-Setup für JDownloader-Statusbenachrichtigungen an Discord
 FROM python:3.12-slim
 WORKDIR /app
 COPY requirements.txt .
