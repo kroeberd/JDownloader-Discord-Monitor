@@ -24,7 +24,7 @@ def send_discord_embed(device_info, download_info):
         "avatar_url": LOGO_URL,
         "embeds": [
             {
-                "title": f"📡 {device_info['name']} ({device_info['id']})",
+                "title": f"📡 {device_info['name']}",
                 "color": 0x00ff00,
                 "fields": [
                     {"name": "Status Gerät", "value": device_info['status'], "inline": True},
@@ -100,7 +100,6 @@ def main():
                 # Gerätedaten
                 device_info = {
                     "name": device.name,
-                    "id": device.id,
                     "status": device.status,
                     "version": getattr(device,"version","-") or "-",
                     "platform": getattr(device,"platform","-") or "-",
@@ -124,7 +123,7 @@ def main():
                     "names": [f.get("name","?") for f in dl]
                 }
 
-                print(f"📡 {name}: {download_info['active']} active, {download_info['speed']/1e6:.2f} MB/s, {download_info['progress']:.1f}% Fortschritt", flush=True)
+                print(f"📡 {name}: {download_info['active']} active, {speed/1e6:.2f} MB/s, {download_info['progress']:.1f}% Fortschritt", flush=True)
                 send_discord_embed(device_info, download_info)
 
             except Exception as e:
