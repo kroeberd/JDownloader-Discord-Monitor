@@ -39,7 +39,8 @@ Die Meldungen erscheinen als **schöne Discord-Embeds** mit:
 
 ## Screenshot
 
-<img width="589" height="402" alt="image" src="https://github.com/user-attachments/assets/9f54484b-d77d-4b2c-be54-e89e0a8c8f7e" />
+<img width="420" height="473" alt="image" src="https://github.com/user-attachments/assets/d631db13-0f36-4fac-885b-b616c6833df2" />
+
 
 
 ---
