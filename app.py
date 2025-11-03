@@ -92,24 +92,22 @@ def main():
         for name in device_names:
             try:
                 device = api.get_device(name)
-                info = device.get_info()  # liefert Dict mit allen Geräteeigenschaften
-                status = "ONLINE" if info.get("online") else "OFFLINE"
 
                 dl = device.downloads.query_links()
                 done_bytes = sum(f.get("bytesLoaded",0) for f in dl)
                 speed = (done_bytes - prev_bytes_dict.get(name,0))/INTERVAL
                 prev_bytes_dict[name] = done_bytes
 
-                # Gerätedaten
+                # Gerätedaten (abwärtskompatibel)
                 device_info = {
-                    "name": info.get('name','?'),
-                    "status": status,
-                    "version": info.get('version','-'),
-                    "platform": info.get('platform','-'),
-                    "uptime": info.get('uptime',0),
-                    "diskSpace": info.get('diskSpace','-'),
-                    "javaVersion": info.get('javaVersion','-'),
-                    "lastActive": info.get('lastActive','-')
+                    "name": getattr(device, "name", "?"),
+                    "status": "ONLINE",  # Standard, da alte myjdapi Versionen kein Status liefern
+                    "version": getattr(device, "version", "-"),
+                    "platform": getattr(device, "platform", "-"),
+                    "uptime": getattr(device, "uptime", 0),
+                    "diskSpace": getattr(device, "diskSpace", "-"),
+                    "javaVersion": getattr(device, "javaVersion", "-"),
+                    "lastActive": getattr(device, "lastActive", "-")
                 }
 
                 # Downloads
