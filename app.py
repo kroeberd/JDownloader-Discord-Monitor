@@ -100,7 +100,7 @@ def main():
                 # Gerätedaten
                 device_info = {
                     "name": device.name,
-                    "status": device.status,
+                    "status": "ONLINE" if device.is_online() else "OFFLINE",
                     "version": getattr(device,"version","-") or "-",
                     "platform": getattr(device,"platform","-") or "-",
                     "uptime": getattr(device,"uptime",0) or 0,
