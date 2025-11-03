@@ -92,6 +92,9 @@ def main():
         for name in device_names:
             try:
                 device = api.get_device(name)
+                info = device.get_info()  # liefert Dict mit allen Geräteeigenschaften
+                status = "ONLINE" if info.get("online") else "OFFLINE"
+
                 dl = device.downloads.query_links()
                 done_bytes = sum(f.get("bytesLoaded",0) for f in dl)
                 speed = (done_bytes - prev_bytes_dict.get(name,0))/INTERVAL
@@ -99,14 +102,14 @@ def main():
 
                 # Gerätedaten
                 device_info = {
-                    "name": device.name,
-                    "status": "ONLINE" if device.is_online() else "OFFLINE",
-                    "version": getattr(device,"version","-") or "-",
-                    "platform": getattr(device,"platform","-") or "-",
-                    "uptime": getattr(device,"uptime",0) or 0,
-                    "diskSpace": getattr(device,"diskSpace","-") or "-",
-                    "javaVersion": getattr(device,"javaVersion","-") or "-",
-                    "lastActive": getattr(device,"lastActive","-") or "-"
+                    "name": info.get('name','?'),
+                    "status": status,
+                    "version": info.get('version','-'),
+                    "platform": info.get('platform','-'),
+                    "uptime": info.get('uptime',0),
+                    "diskSpace": info.get('diskSpace','-'),
+                    "javaVersion": info.get('javaVersion','-'),
+                    "lastActive": info.get('lastActive','-')
                 }
 
                 # Downloads
