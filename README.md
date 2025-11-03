@@ -42,9 +42,8 @@ Die Meldungen erscheinen als **schöne Discord-Embeds** mit:
 
 ## Screenshot
 
-<img width="420" height="473" alt="image" src="https://github.com/user-attachments/assets/d631db13-0f36-4fac-885b-b616c6833df2" />
-
-
+<img width="592" height="740" alt="image" src="https://github.com/user-attachments/assets/79a5910a-fd1a-4fb0-aed9-9310621621c9" />
+(Mehrere JDownloader)
 
 ---
 
