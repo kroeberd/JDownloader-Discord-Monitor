@@ -1,3 +1,8 @@
+# Hinweis:
+# Diese Workflow-Datei ist öffentlich, enthält aber keine geheimen Daten.
+# Secrets wie GHCR_PAT sind in den GitHub Actions Secrets hinterlegt
+# und werden nicht im Repository gespeichert.
+
 name: Build & Push Docker
 
 on:
