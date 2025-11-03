@@ -19,36 +19,36 @@ def send_discord_embed(device_info, download_info):
         print("⚠️ Kein Discord Webhook gesetzt.", flush=True)
         return
 
-    # Gerätedatenfelder dynamisch erstellen
+    # Gerätedatenfelder dynamisch erstellen mit Emojis
     device_fields = [
-        {"name": "Status Gerät", "value": device_info['status'], "inline": True},
-        {"name": "Plattform", "value": device_info['platform'], "inline": True},
-        {"name": "Version", "value": device_info['version'], "inline": True},
+        {"name": "📡 Status Gerät", "value": device_info['status'], "inline": True},
+        {"name": "💻 Plattform", "value": device_info['platform'], "inline": True},
+        {"name": "🏷️ Version", "value": device_info['version'], "inline": True},
     ]
 
     if device_info.get("uptime", 0) > 0:
-        device_fields.append({"name": "Uptime", "value": str(datetime.timedelta(seconds=device_info['uptime'])), "inline": True})
+        device_fields.append({"name": "⏱️ Uptime", "value": str(datetime.timedelta(seconds=device_info['uptime'])), "inline": True})
     if device_info.get("diskSpace"):
-        device_fields.append({"name": "Speicherplatz", "value": device_info['diskSpace'], "inline": True})
+        device_fields.append({"name": "💾 Speicherplatz", "value": device_info['diskSpace'], "inline": True})
     if device_info.get("javaVersion"):
-        device_fields.append({"name": "Java-Version", "value": device_info['javaVersion'], "inline": True})
+        device_fields.append({"name": "☕ Java-Version", "value": device_info['javaVersion'], "inline": True})
     if device_info.get("lastActive"):
-        device_fields.append({"name": "Letzte Aktivität", "value": str(device_info['lastActive']), "inline": True})
+        device_fields.append({"name": "🕒 Letzte Aktivität", "value": str(device_info['lastActive']), "inline": True})
 
-    # Download-Datenfelder dynamisch erstellen
+    # Download-Datenfelder dynamisch erstellen mit Emojis
     download_fields = []
 
     for key, label, value, inline in [
-        ("active", "Downloads aktiv", download_info['active'], True),
-        ("waiting", "Downloads wartend", download_info['waiting'], True),
-        ("finished", "Downloads fertig", download_info['finished'], True),
-        ("paused", "Pausierte Downloads", download_info['paused'], True),
-        ("errors", "Fehlerhafte Downloads", download_info['errors'], True),
-        ("speed", "Speed", download_info['speed'], True),
-        ("progress", "Fortschritt", download_info['progress'], True),
-        ("downloaded_gb", "Daten heruntergeladen", download_info['downloaded_gb'], True),
-        ("total_gb", "Daten gesamt", download_info['total_gb'], True),
-        ("links_total", "Links gesamt", download_info.get('links_total', 0), True)
+        ("active", "⬇️ Downloads aktiv", download_info['active'], True),
+        ("waiting", "⏳ Downloads wartend", download_info['waiting'], True),
+        ("finished", "✅ Downloads fertig", download_info['finished'], True),
+        ("paused", "⏸️ Pausierte Downloads", download_info['paused'], True),
+        ("errors", "❌ Fehlerhafte Downloads", download_info['errors'], True),
+        ("speed", "⚡ Speed", download_info['speed'], True),
+        ("progress", "📊 Fortschritt", download_info['progress'], True),
+        ("downloaded_gb", "📥 Daten heruntergeladen", download_info['downloaded_gb'], True),
+        ("total_gb", "📦 Daten gesamt", download_info['total_gb'], True),
+        ("links_total", "🔗 Links gesamt", download_info.get('links_total', 0), True)
     ]:
         if value and (not isinstance(value, (int, float)) or value != 0):
             if key == "speed":
@@ -61,9 +61,9 @@ def send_discord_embed(device_info, download_info):
                 display_value = str(value)
             download_fields.append({"name": label, "value": display_value, "inline": inline})
 
-    # Dateinamen (max 5) immer anzeigen, oder – wenn keine
+    # Dateinamen (max 5) immer anzeigen
     download_fields.append({
-        "name": "Dateien (max.5)",
+        "name": "📄 Dateien (max.5)",
         "value": "\n".join(f"• {n}" for n in download_info['names'][:5]) or "–",
         "inline": False
     })
