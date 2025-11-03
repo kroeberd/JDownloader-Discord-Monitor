@@ -24,6 +24,7 @@ Die Meldungen erscheinen als **schöne Discord-Embeds** mit:
 - Footer mit Logo
 - Docker- und GitHub Actions-kompatibel
 - Anpassbares Intervall
+- Automatisches Ausblenden von fehlenden Informationen
 
 ---
 
