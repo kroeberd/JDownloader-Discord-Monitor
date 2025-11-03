@@ -1,6 +1,7 @@
 # JDownloader Discord Monitor
 
-Dieses Projekt überwacht **eine oder mehrere JDownloader-Instanzen** über MyJDownloader und sendet regelmäßig **Statusmeldungen an Discord**.  
+Dieses Projekt überwacht **eine oder mehrere JDownloader-Instanzen** über MyJDownloader und sendet regelmäßig **Statusmeldungen an Discord**.
+
 Die Meldungen erscheinen als **schöne Discord-Embeds** mit:
 
 - Aktiven Downloads
