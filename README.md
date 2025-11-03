@@ -35,7 +35,7 @@ Die Meldungen erscheinen als **schöne Discord-Embeds** mit:
 | `WEBHOOK_URL`    | Discord Webhook URL für Statusmeldungen |
 | `MYJD_EMAIL`     | E-Mail-Adresse deines MyJDownloader-Kontos |
 | `MYJD_PASSWORD`  | Passwort deines MyJDownloader-Kontos |
-| `MYJD_DEVICES`   | Komma-separierte Liste von Gerät-Namen (`HomeJD,ServerJD`) |
+| `MYJD_DEVICES`   | Komma-separierte Liste von Geräte-Namen (`HomeJD,ServerJD`) |
 | `INTERVAL`       | Intervall in Sekunden zwischen Statusmeldungen (Standard: 300) |
 
 ---
