@@ -1,7 +1,6 @@
 import os
 import time
 import datetime
-import traceback
 import requests
 from myjdapi import Myjdapi
 
@@ -12,20 +11,10 @@ MYJD_PASSWORD = os.getenv("MYJD_PASSWORD")
 MYJD_DEVICES = os.getenv("MYJD_DEVICES", "JDownloader")  # Komma-separierte Liste
 INTERVAL = int(os.getenv("INTERVAL", "300"))  # Sekunden
 
-# Logo für Footer und Avatar (RAW-Link)
 LOGO_URL = "https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monitor/refs/heads/main/logo.png"
 
-# --- Hilfsfunktionen ---
-def format_bytes(size):
-    power = 2**10
-    n = 0
-    units = {0:"B",1:"KB",2:"MB",3:"GB",4:"TB"}
-    while size > power and n < 4:
-        size /= power
-        n += 1
-    return f"{size:.2f} {units[n]}"
-
-def send_discord_embed(name, running, total_speed, progress, names, downloaded_gb, total_gb, version, platform):
+# --- Discord Embed ---
+def send_discord_embed(device_info, download_info):
     if not WEBHOOK_URL:
         print("⚠️ Kein Discord Webhook gesetzt.", flush=True)
         return
@@ -35,17 +24,27 @@ def send_discord_embed(name, running, total_speed, progress, names, downloaded_g
         "avatar_url": LOGO_URL,
         "embeds": [
             {
-                "title": f"📡 {name}",
+                "title": f"📡 {device_info['name']} ({device_info['id']})",
                 "color": 0x00ff00,
                 "fields": [
-                    {"name": "Aktive Downloads", "value": str(running), "inline": True},
-                    {"name": "Speed", "value": f"{total_speed/1e6:.2f} MB/s", "inline": True},
-                    {"name": "Fortschritt", "value": f"{progress:.1f}%", "inline": True},
-                    {"name": "Daten heruntergeladen", "value": f"{downloaded_gb:.2f} GB", "inline": True},
-                    {"name": "Daten gesamt", "value": f"{total_gb:.2f} GB", "inline": True},
-                    {"name": "Version", "value": version, "inline": True},
-                    {"name": "Plattform", "value": platform, "inline": True},
-                    {"name": "Dateien", "value": "\n".join(f"• {n}" for n in names[:5]) or "–", "inline": False}
+                    {"name": "Status Gerät", "value": device_info['status'], "inline": True},
+                    {"name": "Plattform", "value": device_info['platform'], "inline": True},
+                    {"name": "Version", "value": device_info['version'], "inline": True},
+                    {"name": "Uptime", "value": str(datetime.timedelta(seconds=device_info['uptime'])), "inline": True},
+                    {"name": "Speicherplatz", "value": device_info.get('diskSpace','-'), "inline": True},
+                    {"name": "Java-Version", "value": device_info.get('javaVersion','-'), "inline": True},
+                    {"name": "Letzte Aktivität", "value": str(device_info.get('lastActive','-')), "inline": True},
+
+                    {"name": "Downloads aktiv", "value": str(download_info['active']), "inline": True},
+                    {"name": "Downloads wartend", "value": str(download_info['waiting']), "inline": True},
+                    {"name": "Downloads fertig", "value": str(download_info['finished']), "inline": True},
+                    {"name": "Pausierte Downloads", "value": str(download_info['paused']), "inline": True},
+                    {"name": "Fehlerhafte Downloads", "value": str(download_info['errors']), "inline": True},
+                    {"name": "Speed", "value": f"{download_info['speed']/1e6:.2f} MB/s", "inline": True},
+                    {"name": "Fortschritt", "value": f"{download_info['progress']:.1f}%", "inline": True},
+                    {"name": "Daten heruntergeladen", "value": f"{download_info['downloaded_gb']:.2f} GB", "inline": True},
+                    {"name": "Daten gesamt", "value": f"{download_info['total_gb']:.2f} GB", "inline": True},
+                    {"name": "Dateien (max.5)", "value": "\n".join(f"• {n}" for n in download_info['names'][:5]) or "–", "inline": False}
                 ],
                 "footer": {
                     "text": "by kroeberd | Sarcasm",
@@ -61,9 +60,9 @@ def send_discord_embed(name, running, total_speed, progress, names, downloaded_g
     except Exception as e:
         print(f"❌ Fehler beim Senden des Embeds: {e}", flush=True)
 
-# --- Main Loop ---
+# --- Main ---
 def main():
-    print("🚀 Starte JDownloader Discord Monitor (Unraid-ready, Multi-Device, Embeds, Footer, Logo, Avatar)...", flush=True)
+    print("🚀 Starte JDownloader Discord Monitor...", flush=True)
     api = Myjdapi()
     try:
         api.connect(MYJD_EMAIL, MYJD_PASSWORD)
@@ -75,15 +74,14 @@ def main():
     device_names = [d.strip() for d in MYJD_DEVICES.split(",")]
     print(f"⏱ Intervall: {INTERVAL} Sekunden", flush=True)
 
-    # Speicher vorherige Bytes pro Gerät
     prev_bytes_dict = {}
 
-    # Initialer Durchlauf zum Setzen von prev_bytes, ohne Embed zu senden
+    # Initialer Durchlauf zum Setzen der Bytes
     for name in device_names:
         try:
             device = api.get_device(name)
             dl = device.downloads.query_links()
-            prev_bytes_dict[name] = sum(f.get("bytesLoaded", 0) for f in dl)
+            prev_bytes_dict[name] = sum(f.get("bytesLoaded",0) for f in dl)
         except Exception as e:
             print(f"⚠️ Fehler beim initialen Abruf von '{name}': {e}", flush=True)
 
@@ -95,22 +93,39 @@ def main():
             try:
                 device = api.get_device(name)
                 dl = device.downloads.query_links()
-                done_bytes = sum(f.get("bytesLoaded", 0) for f in dl)
-
-                total_speed = (done_bytes - prev_bytes_dict.get(name, 0)) / INTERVAL
+                done_bytes = sum(f.get("bytesLoaded",0) for f in dl)
+                speed = (done_bytes - prev_bytes_dict.get(name,0))/INTERVAL
                 prev_bytes_dict[name] = done_bytes
 
-                running = len(dl)
-                total_size = sum(f.get("bytesTotal", 0) for f in dl)
-                progress = (done_bytes / total_size * 100) if total_size > 0 else 0
-                names = [f.get("name","?") for f in dl]
-                downloaded_gb = done_bytes / 1e9
-                total_gb = total_size / 1e9
-                version = getattr(device,"version","-") or "-"
-                platform = getattr(device,"platform","-") or "-"
+                # Gerätedaten
+                device_info = {
+                    "name": device.name,
+                    "id": device.id,
+                    "status": device.status,
+                    "version": getattr(device,"version","-") or "-",
+                    "platform": getattr(device,"platform","-") or "-",
+                    "uptime": getattr(device,"uptime",0) or 0,
+                    "diskSpace": getattr(device,"diskSpace","-") or "-",
+                    "javaVersion": getattr(device,"javaVersion","-") or "-",
+                    "lastActive": getattr(device,"lastActive","-") or "-"
+                }
 
-                print(f"📡 {name}: {running} Downloads, {total_speed/1e6:.2f} MB/s, {progress:.1f}% Fortschritt", flush=True)
-                send_discord_embed(name, running, total_speed, progress, names, downloaded_gb, total_gb, version, platform)
+                # Downloads
+                download_info = {
+                    "active": sum(1 for f in dl if f.get("status")=="DOWNLOADING"),
+                    "waiting": sum(1 for f in dl if f.get("status")=="WAITING"),
+                    "finished": sum(1 for f in dl if f.get("status")=="FINISHED"),
+                    "paused": sum(1 for f in dl if f.get("status")=="PAUSED"),
+                    "errors": sum(1 for f in dl if f.get("status")=="ERROR"),
+                    "speed": speed,
+                    "progress": (done_bytes/sum(f.get("bytesTotal",0) for f in dl)*100) if dl else 0,
+                    "downloaded_gb": done_bytes/1e9,
+                    "total_gb": sum(f.get("bytesTotal",0) for f in dl)/1e9,
+                    "names": [f.get("name","?") for f in dl]
+                }
+
+                print(f"📡 {name}: {download_info['active']} active, {download_info['speed']/1e6:.2f} MB/s, {download_info['progress']:.1f}% Fortschritt", flush=True)
+                send_discord_embed(device_info, download_info)
 
             except Exception as e:
                 print(f"⚠️ Fehler bei Gerät '{name}': {e}", flush=True)
