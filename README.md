@@ -12,7 +12,6 @@ Die Meldungen erscheinen als **schöne Discord-Embeds** mit:
 - Version von JDownloader
 - Plattform
 - Bis zu 5 Dateinamen
-- Footer mit „by kroeberd“ und Logo
 
 ---
 
