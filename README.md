@@ -51,7 +51,7 @@ Die Meldungen erscheinen als **schöne Discord-Embeds** mit:
 
 ```bash
 docker run -d \
-  --name jd-discord-status \
+  --name JDownloader-Discord-Monitor \
   -e WEBHOOK_URL="https://discord.com/api/webhooks/xxx/yyy" \
   -e MYJD_EMAIL="me@example.com" \
   -e MYJD_PASSWORD="meinpasswort" \
@@ -66,8 +66,8 @@ docker run -d \
 
 ```xml
 <Container>
-  <Name>jd-discord-status</Name>
-  <Repository>ghcr.io/kroeberd/jdownloader-discord-monitor:latest</Repository>
+  <Name>JDownloader Discord Monitor</Name>
+<Repository>ghcr.io/kroeberd/jdownloader-discord-monitor:latest</Repository>
   <Network>bridge</Network>
   <EnvVars>
     <EnvVar>
@@ -102,7 +102,7 @@ docker run -d \
 ```yaml
 version: "3.8"
 services:
-  jd-discord-status:
+  JDownloader-Discord-Monitor:
     image: ghcr.io/kroeberd/jdownloader-discord-monitor:latest
     container_name: jd-discord-status
     environment:
