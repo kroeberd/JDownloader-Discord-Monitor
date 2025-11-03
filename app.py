@@ -1,3 +1,6 @@
+# app.py für JDownloader-Discord-Monitor
+# Autor: kroeberd
+# Beschreibung: Script, welches den webhook ausfuhrt
 import os
 import time
 import datetime
