@@ -17,7 +17,6 @@ LOGO_URL = "https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monit
 
 # --- Hilfsfunktionen ---
 def format_bytes(size):
-    """Bytes in lesbare Einheiten umrechnen"""
     power = 2**10
     n = 0
     units = {0:"B",1:"KB",2:"MB",3:"GB",4:"TB"}
@@ -27,7 +26,6 @@ def format_bytes(size):
     return f"{size:.2f} {units[n]}"
 
 def send_discord_embed(name, running, total_speed, progress, names, downloaded_gb, total_gb, version, platform):
-    """Sendet Embed an Discord"""
     if not WEBHOOK_URL:
         print("⚠️ Kein Discord Webhook gesetzt.")
         return
@@ -63,11 +61,10 @@ def send_discord_embed(name, running, total_speed, progress, names, downloaded_g
     except Exception as e:
         print(f"❌ Fehler beim Senden des Embeds: {e}")
 
-def get_status(device):
-    """Liest Status von JDownloader"""
+def get_status(device, prev_bytes):
+    """Liest Status von JDownloader und berechnet Geschwindigkeit über INTERVAL"""
     dl = device.downloads.query_links()
     running = len(dl)
-    total_speed = sum(f.get("bytesPerSecond", 0) for f in dl)
     total_size = sum(f.get("bytesTotal", 0) for f in dl)
     done = sum(f.get("bytesLoaded", 0) for f in dl)
     progress = (done / total_size * 100) if total_size > 0 else 0
@@ -79,7 +76,10 @@ def get_status(device):
     version = getattr(device, "version", None) or "-"
     platform = getattr(device, "platform", None) or "-"
 
-    return running, total_speed, progress, names, downloaded_gb, total_gb, version, platform
+    # Berechne Geschwindigkeit über INTERVAL
+    total_speed = (done - prev_bytes) / INTERVAL if prev_bytes is not None else 0
+
+    return running, total_speed, progress, names, downloaded_gb, total_gb, version, platform, done
 
 # --- Main Loop ---
 def main():
@@ -95,6 +95,9 @@ def main():
     device_names = [d.strip() for d in MYJD_DEVICES.split(",")]
     print(f"⏱ Intervall: {INTERVAL} Sekunden")
 
+    # Speicher vorherige bytesLoaded pro Gerät
+    prev_bytes_dict = {name: None for name in device_names}
+
     while True:
         start_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print(f"\n[{start_time}] 🚀 Starte neuen Durchlauf...")
@@ -102,8 +105,10 @@ def main():
         for name in device_names:
             try:
                 device = api.get_device(name)
-                status = get_status(device)
-                running, total_speed, progress, names, downloaded_gb, total_gb, version, platform = status
+                status = get_status(device, prev_bytes_dict[name])
+                running, total_speed, progress, names, downloaded_gb, total_gb, version, platform, done_bytes = status
+
+                prev_bytes_dict[name] = done_bytes  # Speichere für nächste Runde
 
                 print(f"📡 {name}: {running} Downloads, {total_speed/1e6:.2f} MB/s, {progress:.1f}% Fortschritt")
                 send_discord_embed(name, running, total_speed, progress, names, downloaded_gb, total_gb, version, platform)
