@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  jd-discord-status:
+    image: ghcr.io/kroeberd/Jdownloader-discord-monitor:latest
+    container_name: jd-discord-status
+    environment:
+      WEBHOOK_URL: "https://discord.com/api/webhooks/xxx/yyy"
+      MYJD_EMAIL: "me@example.com"
+      MYJD_PASSWORD: "meinpasswort"
+      MYJD_DEVICES: "HomeJD,ServerJD"
+      INTERVAL: 600
+    restart: unless-stopped
