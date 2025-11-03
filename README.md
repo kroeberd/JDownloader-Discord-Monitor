@@ -2,6 +2,8 @@
 
 Dieses Projekt überwacht **eine oder mehrere JDownloader-Instanzen** über MyJDownloader und sendet regelmäßig **Statusmeldungen an Discord**.
 
+Projekt hat noch **Beta**-Status.
+
 Die Meldungen erscheinen als **schöne Discord-Embeds** mit:
 
 - Aktiven Downloads
