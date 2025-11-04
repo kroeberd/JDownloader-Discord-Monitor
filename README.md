@@ -1,4 +1,4 @@
-# ![JDownloader Logo](https://upload.wikimedia.org/wikipedia/commons/8/83/JDownloader_logo.png) JDownloader-Docker-Monitor
+# ![JDownloader Logo](https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monitor/refs/heads/main/logo.png) JDownloader-Docker-Monitor
 
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kroeberd/JDownloader-Discord-Monitor/docker.yml?branch=main)](https://github.com/kroeberd/JDownloader-Discord-Monitor/actions)  
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)  
