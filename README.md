@@ -9,7 +9,12 @@
 
 > ⚠️ *Beta version – use at your own risk.*
 
-![Example Embed](screenshot.png) <!-- Replace with your screenshot -->
+---
+
+## Screenshot
+
+<img width="413" height="722" alt="image" src="https://github.com/user-attachments/assets/28276a79-f172-44a8-842f-1f01ce3c0b28" />
+
 
 ---
 
