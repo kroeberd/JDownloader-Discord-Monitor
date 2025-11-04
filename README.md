@@ -1,7 +1,7 @@
 # ![J[Downloader Logo](# !](https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monitor/refs/heads/main/logos/logo_big_JM_400_300.jpg) 
  # JDownloader-Docker-Monitor
 
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kroeberd/JDownloader-Docker-Monitor/docker-publish.yml?branch=main)](https://github.com/kroeberd/JDownloader-Discord-Monitor/actions)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kroeberd/JDownloader-Docker-Monitor/docker-publish.yml)](https://github.com/kroeberd/JDownloader-Discord-Monitor/actions)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 
 **JDownloader-Docker-Monitor** monitors one or more JDownloader instances via **MyJDownloader** and sends periodic **Discord updates** as rich embeds.
@@ -16,7 +16,7 @@
 <img width="516" height="714" alt="image" src="https://github.com/user-attachments/assets/bf011195-9c02-48a2-a86c-a32e13f6932e" />
 
 
-## German Versiom
+## German version
 <img width="525" height="740" alt="image" src="https://github.com/user-attachments/assets/f4b25c5d-dafe-4c5f-9763-5cc3317bb76e" />
 
 ---
