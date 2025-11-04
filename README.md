@@ -13,7 +13,8 @@
 # Screenshot
 
 ## English version
-<img width="625" height="723" alt="image" src="https://github.com/user-attachments/assets/288aa6ac-9185-4d74-bef8-90f8d89a257b" />
+<img width="516" height="714" alt="image" src="https://github.com/user-attachments/assets/bf011195-9c02-48a2-a86c-a32e13f6932e" />
+
 
 ## German Versiom
 <img width="525" height="740" alt="image" src="https://github.com/user-attachments/assets/f4b25c5d-dafe-4c5f-9763-5cc3317bb76e" />
