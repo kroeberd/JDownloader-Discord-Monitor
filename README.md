@@ -19,7 +19,8 @@
 - ✅ Discord embeds with colors, emojis, and footer logo  
 - ✅ Configurable interval between updates  
 - ✅ Automatic hiding of unavailable fields  
-- ✅ Works with Docker, Docker Compose, and Unraid  
+- ✅ Works with Docker, Docker Compose, and Unraid
+- ✅ Multilingual, english or german
 
 ---
 
@@ -47,6 +48,8 @@ Each Discord embed may include:
 | `MYJD_PASSWORD` | Password for your MyJDownloader account |
 | `MYJD_DEVICES`  | Comma-separated device names (e.g., `HomeJD,ServerJD`) |
 | `INTERVAL`      | Interval in seconds between updates (default: `300`) |
+| `LANG`      | `en` for englisch, `de` for german  |
+
 
 ---
 
@@ -62,6 +65,7 @@ docker run -d \
   -e MYJD_PASSWORD="myPassword" \
   -e MYJD_DEVICES="HomeJD,ServerJD" \
   -e INTERVAL=600 \
+  -e LANG=en \
   ghcr.io/kroeberd/jdownloader-discord-monitor:latest
 ```
 
@@ -102,4 +106,5 @@ services:
       MYJD_PASSWORD: "myPassword"
       MYJD_DEVICES: "HomeJD,ServerJD"
       INTERVAL: 600
+      LANG: en
     restart: unless-stopped
