@@ -10,10 +10,13 @@
 
 ---
 
-## Screenshot
+# Screenshot
 
-<img width="413" height="722" alt="image" src="https://github.com/user-attachments/assets/28276a79-f172-44a8-842f-1f01ce3c0b28" />
+## English version
+<img width="625" height="723" alt="image" src="https://github.com/user-attachments/assets/288aa6ac-9185-4d74-bef8-90f8d89a257b" />
 
+## German Versiom
+<img width="525" height="740" alt="image" src="https://github.com/user-attachments/assets/f4b25c5d-dafe-4c5f-9763-5cc3317bb76e" />
 
 ---
 
@@ -114,3 +117,8 @@ services:
       INTERVAL: 600
       LANG: en
     restart: unless-stopped
+```
+---
+
+## Thanks to
+> Shadow_the_Vulpz (Discord) for the Logos.
