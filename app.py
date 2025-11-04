@@ -12,7 +12,7 @@ MYJD_DEVICES = os.getenv("MYJD_DEVICES", "JDownloader")
 INTERVAL = int(os.getenv("INTERVAL", "300"))
 LANG = os.getenv("LANG", "de").lower()  # "de" oder "en"
 
-LOGO_URL = "https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monitor/refs/heads/main/logo.png"
+LOGO_URL = "https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monitor/refs/heads/main/logos/logo_jm_128px.png"
 
 # --- Mehrsprachige Texte ---
 TEXTS = {
