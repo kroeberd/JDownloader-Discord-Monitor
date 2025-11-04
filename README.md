@@ -85,6 +85,7 @@ Example Unraid container configuration:
     <EnvVar><Key>MYJD_PASSWORD</Key><Value>myPassword</Value></EnvVar>
     <EnvVar><Key>MYJD_DEVICES</Key><Value>HomeJD,ServerJD</Value></EnvVar>
     <EnvVar><Key>INTERVAL</Key><Value>600</Value></EnvVar>
+<EnvVar><Key>LANG</Key><Value>en</Value></EnvVar>
   </EnvVars>
   <RestartPolicy>unless-stopped</RestartPolicy>
 </Container>
