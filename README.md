@@ -3,7 +3,7 @@
 
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kroeberd/JDownloader-Discord-Monitor/docker.yml?branch=main)](https://github.com/kroeberd/JDownloader-Discord-Monitor/actions)  
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)  
-[![Docker Pulls](https://img.shields.io/docker/pulls/kroeberd/jdownloader-discord-monitor)](https://hub.docker.com/r/kroeberd/jdownloader-discord-monitor)  
+[![Docker Pulls](https://img.shields.io/docker/pulls/kroeberd/jdownloader-discord-monitor)](https://hub.docker.com/r/kroeberd/jdownloader-docker-monitor)  
 
 **JDownloader-Docker-Monitor** monitors one or more JDownloader instances via **MyJDownloader** and sends periodic **Discord updates** as rich embeds.
 
