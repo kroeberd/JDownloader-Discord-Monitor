@@ -1,0 +1,36 @@
+# Hinweis:
+# Diese Workflow-Datei ist öffentlich, enthält aber keine geheimen Daten.
+# Secrets wie GHCR_PAT sind in den GitHub Actions Secrets hinterlegt
+# und werden nicht im Repository gespeichert.
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build Docker image
+      run: |
+        docker build -t jdownloader-docker-monitor:latest .
+
+    - name: Tag Docker image
+      run: |
+        docker tag jdownloader-docker-monitor:latest ${{ secrets.DOCKERHUB_USERNAME }}/jdownloader-docker-monitor:latest
+
+    - name: Push Docker image
+      run: |
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/jdownloader-docker-monitor:latest
