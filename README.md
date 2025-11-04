@@ -1,7 +1,7 @@
 # ![J[Downloader Logo](# !](https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monitor/refs/heads/main/logos/logo_big_JM_400_300.jpg) 
  # JDownloader-Docker-Monitor
 
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kroeberd/JDownloader-Docker-Monitor/docker-publish.yml?branch=main)](https://github.com/kroeberd/JDownloader-Docker-Monitor/actions)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/kroeberd/JDownloader-Docker-Monitor/docker-publish.yml?branch=main)](https://github.com/kroeberd/JDownloader-Discord-Monitor/actions)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 [![Docker Pulls](https://img.shields.io/docker/pulls/kroeberd/jdownloader-docker-monitor)](https://github.com/kroeberd/JDownloader-Discord-Monitor/actions)
 
