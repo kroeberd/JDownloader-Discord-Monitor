@@ -1,6 +1,3 @@
-# app.py für JDownloader-Discord-Monitor
-# Autor: kroeberd
-# Beschreibung: Script, welches den webhook ausfuhrt
 import os
 import time
 import datetime
@@ -23,7 +20,7 @@ def send_discord_embed(device_info, download_info):
         print("⚠️ Kein Discord Webhook gesetzt.", flush=True)
         return
 
-    # Gerätedatenfelder dynamisch erstellen mit Emojis
+    # Gerätedatenfelder
     device_fields = [
         {"name": "📡 Status Gerät", "value": device_info['status'], "inline": True},
         {"name": "💻 Plattform", "value": device_info['platform'], "inline": True},
@@ -43,9 +40,8 @@ def send_discord_embed(device_info, download_info):
     if device_info.get("lastActive"):
         device_fields.append({"name": "🕒 Letzte Aktivität", "value": str(device_info['lastActive']), "inline": True})
 
-    # Download-Datenfelder dynamisch erstellen mit Emojis
+    # Download-Datenfelder
     download_fields = []
-
     for key, label, value, inline in [
         ("active", "⬇️ Downloads aktiv", download_info['active'], True),
         ("waiting", "⏳ Downloads wartend", download_info['waiting'], True),
@@ -69,10 +65,10 @@ def send_discord_embed(device_info, download_info):
                 display_value = str(value)
             download_fields.append({"name": label, "value": display_value, "inline": inline})
 
-    # Dateinamen (max. 5)
+    # Nur die letzten 5 Dateien anzeigen
     download_fields.append({
-        "name": "📄 Dateien (max.5)",
-        "value": "\n".join(f"• {n}" for n in download_info['names'][:5]) or "–",
+        "name": "📄 Zuletzt aktive Dateien (max. 5)",
+        "value": "\n".join(f"• {n}" for n in download_info['names'][-5:]) or "–",
         "inline": False
     })
 
@@ -196,4 +192,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-                
