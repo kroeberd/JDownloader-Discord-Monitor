@@ -5,8 +5,6 @@
 
 **JDownloader-Docker-Monitor** monitors one or more JDownloader instances via **MyJDownloader** and sends periodic **Discord updates** as rich embeds.
 
-> ⚠️ *Beta version – use at your own risk.*
-
 ---
 
 # Screenshot
