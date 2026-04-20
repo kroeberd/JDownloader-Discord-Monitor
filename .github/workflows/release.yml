@@ -32,6 +32,48 @@ jobs:
             echo "version=v0.0.1" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Build release notes from changelog
+        id: notes
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          version = "${{ steps.version.outputs.version }}"
+          changelog = Path("CHANGELOG.md")
+          if not changelog.exists():
+              raise SystemExit("CHANGELOG.md is required for releases.")
+
+          lines = changelog.read_text(encoding="utf-8").splitlines()
+          heading = re.compile(r"^## \[(.+?)\](?: - .+)?$")
+          start = None
+          end = None
+
+          for index, line in enumerate(lines):
+              match = heading.match(line)
+              if not match:
+                  continue
+              if match.group(1) == version:
+                  start = index + 1
+                  continue
+              if start is not None:
+                  end = index
+                  break
+
+          if start is None:
+              raise SystemExit(f"No changelog section found for {version}.")
+
+          if end is None:
+              end = len(lines)
+
+          body = "\n".join(lines[start:end]).strip()
+          if not body:
+              raise SystemExit(f"Changelog section for {version} is empty.")
+
+          Path("release-notes.md").write_text(body + "\n", encoding="utf-8")
+          PY
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -56,4 +98,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.version }}
-          generate_release_notes: true
+          body_path: release-notes.md
