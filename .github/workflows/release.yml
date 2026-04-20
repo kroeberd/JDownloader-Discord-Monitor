@@ -16,30 +16,37 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Read version
         id: version
-        run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+        run: |
+          VERSION="$(cat VERSION)"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Validate tag matches version
+        run: |
+          if [ "${GITHUB_REF_NAME}" != "${{ steps.version.outputs.tag }}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match VERSION ${{ steps.version.outputs.version }}"
+            exit 1
+          fi
 
       - name: Extract changelog for this version
         id: changelog
         run: |
-          VERSION=$(cat VERSION)
+          VERSION="${{ steps.version.outputs.version }}"
           BODY=$(awk "/^## \[$VERSION\]/{found=1; next} found && /^## \[/{exit} found{print}" CHANGELOG.md)
+          if [ -z "$BODY" ]; then
+            echo "No changelog section found for version $VERSION"
+            exit 1
+          fi
           {
             echo "body<<CHANGELOG_EOF"
             echo "$BODY"
             echo "CHANGELOG_EOF"
           } >> "$GITHUB_OUTPUT"
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
-        with:
-          name: "v${{ steps.version.outputs.version }}"
-          body: ${{ steps.changelog.outputs.body }}
-          draft: false
-          prerelease: false
-          make_latest: true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -82,3 +89,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "${{ steps.version.outputs.tag }}"
+          body: ${{ steps.changelog.outputs.body }}
+          draft: false
+          prerelease: false
+          make_latest: true
