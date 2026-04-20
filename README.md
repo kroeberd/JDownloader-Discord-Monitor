@@ -5,7 +5,10 @@
 # JDownloader Monitor
 
 [![Version](https://img.shields.io/badge/version-v0.0.1-ff7b32)](https://github.com/kroeberd/jdownloader-discord-monitor/releases)
+[![Docker Pulls](https://img.shields.io/docker/pulls/kroeberd/jdownloader-discord-monitor?style=flat-square&color=3b82f6)](https://hub.docker.com/r/kroeberd/jdownloader-discord-monitor)
+[![Discord](https://img.shields.io/badge/Discord-Join-5865f2?logo=discord&logoColor=white)](https://discord.gg/8Vb9cj4ksv)
 [![License](https://img.shields.io/badge/license-GPL--3.0-4e8dff)](LICENSE)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-Support-ffdd00?logo=buymeacoffee&logoColor=000000)](https://buymeacoffee.com/kroeberd)
 
 </div>
 
@@ -136,3 +139,9 @@ Run checks locally with:
 python -m compileall jd_monitor
 pytest
 ```
+
+## Community
+
+- Discord: [discord.gg/8Vb9cj4ksv](https://discord.gg/8Vb9cj4ksv)
+- Docker Hub: [kroeberd/jdownloader-discord-monitor](https://hub.docker.com/r/kroeberd/jdownloader-discord-monitor)
+- Buy Me a Coffee: [buymeacoffee.com/kroeberd](https://buymeacoffee.com/kroeberd)
