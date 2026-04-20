@@ -2,13 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is inspired by Keep a Changelog and uses repository tags as release identifiers.
+The release workflow reads the section matching the value in `VERSION` and publishes it as the GitHub release body.
 
 ## [Unreleased]
 
+### Added
+
 - No unreleased entries yet.
 
-## [v0.0.1] - 2026-04-20
+## [0.0.1] - 2026-04-20
 
 ### Added
 
@@ -18,12 +20,15 @@ The format is inspired by Keep a Changelog and uses repository tags as release i
 - Discord theme system with built-in templates and preview rendering.
 - Health endpoints, structured logging, Docker-first deployment, tests, and release workflow support.
 - New brand-aligned SVG logo inspired by the visual direction of Mediastarr and alldebrid-client.
+- Dedicated release workflow with GitHub Release, GHCR publishing, Docker Hub publishing, and build cache support.
 
 ### Changed
 
-- Project versioning reset to `v0.0.1` to mark the new foundation release.
+- Project versioning now uses `VERSION` as the single release source of truth.
+- Git tag format remains `v<version>`, while changelog headings use `[<version>]`.
 - README rewritten with architecture notes, migration guidance, and deployment instructions.
 
 ### Fixed
 
-- GitHub release workflow now normalizes GHCR image names to lowercase before publishing.
+- Release notes are now taken directly from the matching changelog section for the active version.
+- GHCR publishing no longer depends on mixed-case repository names.

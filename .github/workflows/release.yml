@@ -4,98 +4,81 @@ on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
 
 jobs:
   release:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      packages: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Normalize image name
-        id: image
-        shell: bash
-        run: echo "name=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
-
-      - name: Extract version
+      - name: Read version
         id: version
-        shell: bash
+        run: echo "version=$(cat VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: Extract changelog for this version
+        id: changelog
         run: |
-          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-            echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
-          else
-            echo "version=v0.0.1" >> "$GITHUB_OUTPUT"
-          fi
+          VERSION=$(cat VERSION)
+          BODY=$(awk "/^## \[$VERSION\]/{found=1; next} found && /^## \[/{exit} found{print}" CHANGELOG.md)
+          {
+            echo "body<<CHANGELOG_EOF"
+            echo "$BODY"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Build release notes from changelog
-        id: notes
-        shell: bash
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-          import re
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "v${{ steps.version.outputs.version }}"
+          body: ${{ steps.changelog.outputs.body }}
+          draft: false
+          prerelease: false
+          make_latest: true
 
-          version = "${{ steps.version.outputs.version }}"
-          changelog = Path("CHANGELOG.md")
-          if not changelog.exists():
-              raise SystemExit("CHANGELOG.md is required for releases.")
-
-          lines = changelog.read_text(encoding="utf-8").splitlines()
-          heading = re.compile(r"^## \[(.+?)\](?: - .+)?$")
-          start = None
-          end = None
-
-          for index, line in enumerate(lines):
-              match = heading.match(line)
-              if not match:
-                  continue
-              if match.group(1) == version:
-                  start = index + 1
-                  continue
-              if start is not None:
-                  end = index
-                  break
-
-          if start is None:
-              raise SystemExit(f"No changelog section found for {version}.")
-
-          if end is None:
-              end = len(lines)
-
-          body = "\n".join(lines[start:end]).strip()
-          if not body:
-              raise SystemExit(f"Changelog section for {version} is empty.")
-
-          Path("release-notes.md").write_text(body + "\n", encoding="utf-8")
-          PY
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GitHub Container Registry
+      - name: Login to GHCR
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PAT }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v6
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/kroeberd/jdownloader-discord-monitor
+            kroeberd/jdownloader-discord-monitor
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
           platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ steps.image.outputs.name }}:${{ steps.version.outputs.version }}
-            ${{ steps.image.outputs.name }}:latest
-
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          body_path: release-notes.md
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
