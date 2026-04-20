@@ -1,45 +1,72 @@
-# Hinweis:
-# Diese Workflow-Datei ist öffentlich, enthält aber keine geheimen Daten.
-# Secrets wie GHCR_PAT sind in den GitHub Actions Secrets hinterlegt
-# und werden nicht im Repository gespeichert.
-name: Build and Push Docker Image
+# Note:
+# This workflow file is public, but it does not contain secrets.
+# Secrets like GHCR_PAT and DOCKERHUB_TOKEN are stored in GitHub Actions Secrets
+# and are not committed to the repository.
+name: Publish Containers
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
-  build-and-push:
+  publish:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Build Docker image
-      run: |
-        docker build -t jdownloader-docker-monitor:latest .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Tag Docker image
-      run: |
-        docker tag jdownloader-docker-monitor:latest ${{ secrets.DOCKERHUB_USERNAME }}/jdownloader-docker-monitor:latest
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GHCR_PAT || secrets.GITHUB_TOKEN }}
 
-    - name: Push Docker image
-      run: |
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/jdownloader-docker-monitor:latest
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Sync Docker Hub description
-      uses: peter-evans/dockerhub-description@v4
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: ${{ secrets.DOCKERHUB_USERNAME }}/jdownloader-docker-monitor
-        short-description: Production-ready JDownloader monitor with modern web UI and Discord webhooks.
-        readme-filepath: ./README.md
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/kroeberd/jdownloader-discord-monitor
+            kroeberd/jdownloader-docker-monitor
+          tags: |
+            type=raw,value=latest
+
+      - name: Build and push images
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Sync Docker Hub README
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/jdownloader-docker-monitor
+          short-description: Production-ready JDownloader monitor with modern web UI and Discord webhooks.
+          readme-filepath: ./README.md
