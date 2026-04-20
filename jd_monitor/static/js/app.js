@@ -65,11 +65,13 @@ function renderDashboard() {
           <h3>${device.display_name}</h3>
           <span class="badge ${device.status === "online" ? "ok" : device.status === "offline" ? "error" : "degraded"}">${device.status}</span>
         </div>
+        <p class="device-summary">${device.message || "No recent status message."}</p>
         <div class="editor-grid">
           <div><span class="device-meta">Speed</span><strong>${(device.totals.speed_bytes_per_second / 1024 / 1024).toFixed(2)} MB/s</strong></div>
           <div><span class="device-meta">Progress</span><strong>${device.totals.progress_percent.toFixed(1)}%</strong></div>
           <div><span class="device-meta">Active</span><strong>${device.totals.active}</strong></div>
           <div><span class="device-meta">Queue</span><strong>${device.totals.links_total}</strong></div>
+          <div><span class="device-meta">Connectivity</span><strong>${device.connectivity_message || "Unknown"}</strong></div>
         </div>
       </div>
     `)
@@ -104,9 +106,13 @@ function deviceCard(device, index) {
         <label>Display name <input data-key="display_name" value="${device.display_name || ""}"></label>
         <label>Poll interval (s) <input data-key="poll_interval_seconds" type="number" value="${device.poll_interval_seconds}"></label>
         <label>Summary interval (min) <input data-key="summary_interval_minutes" type="number" value="${device.summary_interval_minutes}"></label>
+        <label>Direct host or IP <input data-key="connectivity.host" value="${device.connectivity?.host || ""}" placeholder="192.168.178.50"></label>
+        <label>Direct port <input data-key="connectivity.port" type="number" value="${device.connectivity?.port || 9666}"></label>
+        <label>Probe timeout (s) <input data-key="connectivity.timeout_seconds" type="number" value="${device.connectivity?.timeout_seconds || 3}"></label>
         <label>Webhooks <select data-key="webhook_ids" multiple>${options}</select></label>
       </div>
       <label class="checkbox-row"><input data-key="enabled" type="checkbox" ${device.enabled ? "checked" : ""}>Enabled</label>
+      <label class="checkbox-row"><input data-key="connectivity.enabled" type="checkbox" ${device.connectivity?.enabled ? "checked" : ""}>Use local fallback connectivity probe</label>
     </div>
   `;
 }
@@ -159,6 +165,12 @@ function collectEditors() {
     poll_interval_seconds: Number(card.querySelector("[data-key='poll_interval_seconds']").value),
     summary_interval_minutes: Number(card.querySelector("[data-key='summary_interval_minutes']").value),
     webhook_ids: Array.from(card.querySelector("[data-key='webhook_ids']").selectedOptions).map((opt) => opt.value),
+    connectivity: {
+      enabled: card.querySelector("[data-key='connectivity.enabled']").checked,
+      host: card.querySelector("[data-key='connectivity.host']").value || null,
+      port: Number(card.querySelector("[data-key='connectivity.port']").value || 9666),
+      timeout_seconds: Number(card.querySelector("[data-key='connectivity.timeout_seconds']").value || 3),
+    },
     quiet_hours: { enabled: false, start: "23:00", end: "07:00", timezone: state.config.timezone },
   }));
 
@@ -231,6 +243,7 @@ document.getElementById("add-device").addEventListener("click", () => {
     poll_interval_seconds: 300,
     summary_interval_minutes: 30,
     webhook_ids: [],
+    connectivity: { enabled: false, host: "", port: 9666, timeout_seconds: 3 },
     quiet_hours: { enabled: false, start: "23:00", end: "07:00", timezone: state.config.timezone },
   });
   renderEditors();

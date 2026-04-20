@@ -11,6 +11,7 @@ from jd_monitor.db import init_db
 from jd_monitor.log_setup import configure_logging, memory_logs
 from jd_monitor.repo_utils import ConfigRepository, DeviceStateRepository, NotificationRepository
 from jd_monitor.schemas import DeviceSnapshot, TransferTotals
+from jd_monitor.services.connectivity import ConnectivityService
 from jd_monitor.services.defaults import default_config_from_env
 from jd_monitor.services.myjd import MyJDownloaderService
 from jd_monitor.services.notifications import NotificationService
@@ -68,8 +69,9 @@ async def lifespan(app: FastAPI):
     device_repo = DeviceStateRepository()
     notification_repo = NotificationRepository()
     myjd = MyJDownloaderService()
+    connectivity = ConnectivityService()
     notifications = NotificationService(notification_repo)
-    poller = PollerService(config_repo, device_repo, notification_repo, myjd, notifications)
+    poller = PollerService(config_repo, device_repo, notification_repo, myjd, connectivity, notifications)
 
     app.state.services = AppServices(
         config_repo=config_repo,

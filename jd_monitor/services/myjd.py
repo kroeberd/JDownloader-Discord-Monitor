@@ -97,6 +97,10 @@ class MyJDownloaderService:
             disk_free_bytes=self._safe_int(getattr(jd_device, "diskSpace", None)),
             java_version=getattr(jd_device, "javaVersion", None),
             last_active_at=self._coerce_dt(getattr(jd_device, "lastActive", None)),
+            connectivity_status="unknown" if device.connectivity.enabled else "unconfigured",
+            connectivity_message=(
+                "Local endpoint configured" if device.connectivity.enabled else "No local endpoint configured"
+            ),
             totals=totals,
             recent_files=recent,
             checked_at=datetime.utcnow(),

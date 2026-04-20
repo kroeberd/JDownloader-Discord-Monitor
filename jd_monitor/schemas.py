@@ -45,6 +45,21 @@ class CredentialsConfig(BaseModel):
     password: str = ""
 
 
+class ConnectivityConfig(BaseModel):
+    enabled: bool = False
+    host: str | None = None
+    port: int = Field(default=9666, ge=1, le=65535)
+    timeout_seconds: int = Field(default=3, ge=1, le=15)
+
+    @field_validator("host", mode="before")
+    @classmethod
+    def normalize_host(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        stripped = value.strip()
+        return stripped or None
+
+
 class BrandingConfig(BaseModel):
     username: str = "JDownloader Monitor"
     avatar_url: str | None = None
@@ -70,6 +85,7 @@ class DeviceConfig(BaseModel):
     webhook_ids: list[str] = Field(default_factory=list)
     summary_interval_minutes: int = Field(default=30, ge=5, le=1440)
     quiet_hours: QuietHoursConfig = Field(default_factory=QuietHoursConfig)
+    connectivity: ConnectivityConfig = Field(default_factory=ConnectivityConfig)
 
 
 class WebhookConfig(BaseModel):
@@ -145,6 +161,8 @@ class DeviceSnapshot(BaseModel):
     disk_free_bytes: int | None = None
     java_version: str | None = None
     last_active_at: datetime | None = None
+    connectivity_status: Literal["unknown", "unconfigured", "reachable", "unreachable"] = "unknown"
+    connectivity_message: str | None = None
     totals: TransferTotals = Field(default_factory=TransferTotals)
     recent_files: list[DownloadEntry] = Field(default_factory=list)
     checked_at: datetime = Field(default_factory=utc_now)

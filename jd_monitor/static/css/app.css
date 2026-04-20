@@ -83,6 +83,7 @@ body {
 
 .brand h1, .hero h2, .card h3, .section-banner h3 { margin: 0; }
 .brand p, .eyebrow, .notes, .log-meta, .device-meta { color: var(--muted); }
+.device-summary { margin: 0 0 16px; color: #d5e3f9; line-height: 1.5; }
 
 .sidebar-version {
   margin: 0 0 22px;

@@ -45,6 +45,7 @@ def _fields(locale: LocaleName, snapshot: DeviceSnapshot, webhook: WebhookConfig
             (tr(locale, "version"), snapshot.version),
             (tr(locale, "uptime"), format_uptime(snapshot.uptime_seconds)),
             (tr(locale, "disk"), format_bytes(snapshot.disk_free_bytes)),
+            (tr(locale, "connectivity"), snapshot.connectivity_message),
         ]:
             if value and value != "-":
                 fields.append({"name": name, "value": str(value), "inline": True})
@@ -71,13 +72,13 @@ def _fields(locale: LocaleName, snapshot: DeviceSnapshot, webhook: WebhookConfig
 def render_payload(webhook: WebhookConfig, snapshot: DeviceSnapshot, event_type: NotificationMode) -> dict:
     locale = webhook.locale
     title = tr(locale, EVENT_TITLES[event_type])
-    footer_text = f"JD - Monitor • {snapshot.display_name} • {__version__}"
+    footer_text = f"JD - Monitor . {snapshot.display_name} . {__version__}"
     payload = {
         "username": webhook.branding.username,
         "avatar_url": webhook.branding.avatar_url,
         "embeds": [
             {
-                "title": f"{title} • {snapshot.display_name}",
+                "title": f"{title} . {snapshot.display_name}",
                 "description": snapshot.message or f"{snapshot.display_name} is {snapshot.status}.",
                 "color": THEME_COLORS[webhook.theme],
                 "fields": _fields(locale, snapshot, webhook),
@@ -104,7 +105,7 @@ def render_preview(webhook: WebhookConfig, snapshot: DeviceSnapshot, event_type:
         for field in embed["fields"]
     )
     footer_html = (
-        f"<div class='discord-preview-footer'>{embed['footer']['text']} • "
+        f"<div class='discord-preview-footer'>{embed['footer']['text']} . "
         f"{datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</div>"
     )
     html = (
