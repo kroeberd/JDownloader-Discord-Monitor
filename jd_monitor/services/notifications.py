@@ -26,6 +26,13 @@ class NotificationService:
         snapshot: DeviceSnapshot,
         event_type: NotificationMode,
     ) -> NotificationAttempt | None:
+        if snapshot.device_id not in webhook.device_ids:
+            logger.warning(
+                "Skipped notification because device is not assigned to webhook",
+                extra={"extra": {"webhook_id": webhook.id, "device_id": snapshot.device_id}},
+            )
+            return None
+
         payload = render_payload(webhook, snapshot, event_type)
         fingerprint = fingerprint_payload(payload)
         if self.repository.was_recently_sent(webhook.id, snapshot.device_id, fingerprint, webhook.throttle_seconds):

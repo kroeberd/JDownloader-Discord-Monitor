@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from jd_monitor import __version__
 from jd_monitor.schemas import AppConfig, DashboardSummary, PreviewRequest, PreviewResponse, TestWebhookRequest
 from jd_monitor.services.defaults import default_config_from_env
+from jd_monitor.services.myjd import InvalidCredentialsError, MyJdError
 from jd_monitor.services.themes import available_themes, render_preview
 
 templates = Jinja2Templates(directory="jd_monitor/templates")
@@ -21,7 +23,12 @@ async def home(request: Request):
     return templates.TemplateResponse(
         request,
         "index.html",
-        {"request": request, "title": "JDownloader Monitor", "themes": available_themes()},
+        {
+            "request": request,
+            "title": "JDownloader Monitor",
+            "themes": available_themes(),
+            "app_version": __version__,
+        },
     )
 
 
@@ -77,7 +84,38 @@ async def preview(payload: PreviewRequest, svc=Depends(services)):
 
 @router.post("/api/webhooks/test")
 async def send_test(payload: TestWebhookRequest, svc=Depends(services)):
-    snapshot = payload.snapshot or svc.sample_snapshot()
+    config = svc.config_repo.load() or default_config_from_env()
+    configured_devices = {device.id: device for device in config.devices if device.enabled}
+    target_ids = [device_id for device_id in payload.webhook.device_ids if device_id in configured_devices]
+
+    if not target_ids:
+        raise HTTPException(
+            status_code=400,
+            detail="Assign at least one enabled JDownloader device to the webhook before test-send.",
+        )
+
+    snapshot = None
+    errors: list[str] = []
+    for device_id in target_ids:
+        device = configured_devices[device_id]
+        try:
+            snapshot = await svc.myjd.fetch_snapshot(
+                config.credentials.email,
+                config.credentials.password,
+                device,
+            )
+            svc.device_repo.save(snapshot)
+            break
+        except (InvalidCredentialsError, MyJdError) as exc:
+            errors.append(f"{device.display_name or device.name}: {exc}")
+
+    if snapshot is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Could not verify any mapped JDownloader device before sending the webhook test. "
+            + " | ".join(errors),
+        )
+
     attempt = await svc.notifications.send_test(payload.webhook, snapshot)
     return {"ok": attempt.delivered if attempt else False, "attempt": attempt}
 

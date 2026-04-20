@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="logos/logo.svg" width="128" alt="JDownloader Monitor logo"/>
+<img src="https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monitor/main/logos/logo.svg" width="128" alt="JDownloader Monitor logo"/>
 
 # JDownloader Monitor
 
@@ -145,3 +145,7 @@ pytest
 - Discord: [discord.gg/8Vb9cj4ksv](https://discord.gg/8Vb9cj4ksv)
 - Docker Hub: [kroeberd/jdownloader-discord-monitor](https://hub.docker.com/r/kroeberd/jdownloader-discord-monitor)
 - Buy Me a Coffee: [buymeacoffee.com/kroeberd](https://buymeacoffee.com/kroeberd)
+
+## Docker Hub README
+
+The repository README is synced to Docker Hub automatically from `main` via GitHub Actions so Docker Hub always shows the current project documentation.

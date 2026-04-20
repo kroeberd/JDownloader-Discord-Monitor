@@ -1,3 +1,4 @@
+from jd_monitor import __version__
 from jd_monitor.schemas import BrandingConfig, DeviceSnapshot, ThemeCustomization, TransferTotals, WebhookConfig
 from jd_monitor.services.themes import render_payload
 
@@ -39,3 +40,21 @@ def test_payload_uses_theme_color():
     )
     payload = render_payload(webhook, snapshot, "summary")
     assert payload["embeds"][0]["color"] == 0x3FB950
+
+
+def test_payload_footer_contains_instance_and_version():
+    webhook = WebhookConfig(
+        id="wh-1",
+        name="Discord",
+        url="https://discord.com/api/webhooks/test/test",
+        device_ids=["device-1"],
+    )
+    snapshot = DeviceSnapshot(
+        device_id="device-1",
+        device_name="Box",
+        display_name="Box",
+        status="online",
+        totals=TransferTotals(),
+    )
+    payload = render_payload(webhook, snapshot, "summary")
+    assert payload["embeds"][0]["footer"]["text"] == f"JD - Monitor • Box • {__version__}"
