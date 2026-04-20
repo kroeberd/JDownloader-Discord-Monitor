@@ -4,7 +4,7 @@
 
 # JDownloader Monitor
 
-[![Version](https://img.shields.io/badge/version-v0.0.1-ff7b32)](https://github.com/kroeberd/jdownloader-discord-monitor/releases)
+[![Version](https://img.shields.io/badge/version-v0.0.2-ff7b32)](https://github.com/kroeberd/jdownloader-discord-monitor/releases)
 [![Docker Pulls](https://img.shields.io/docker/pulls/kroeberd/jdownloader-discord-monitor?style=flat-square&color=3b82f6)](https://hub.docker.com/r/kroeberd/jdownloader-discord-monitor)
 [![Discord](https://img.shields.io/badge/Discord-Join-5865f2?logo=discord&logoColor=white)](https://discord.gg/8Vb9cj4ksv)
 [![License](https://img.shields.io/badge/license-GPL--3.0-4e8dff)](LICENSE)
@@ -12,7 +12,7 @@
 
 </div>
 
-`v0.0.1` is the clean rebuilt foundation of the original monitor: a production-oriented self-hosted application with a modern GUI, persistent configuration, reliable polling, health endpoints, and a flexible Discord theme system.
+`v0.0.2` continues the clean rebuilt foundation of the original monitor with stronger webhook safety checks, Docker Hub README sync, a refreshed UI, and version-aware Discord footer rendering.
 
 ## Existing Repository Analysis
 

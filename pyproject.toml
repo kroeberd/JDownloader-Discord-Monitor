@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jdownloader-discord-monitor"
-version = "0.0.1"
+version = "0.0.2"
 description = "Production-ready JDownloader to Discord monitor with web UI, theming, and reliable polling."
 readme = "README.md"
 requires-python = ">=3.12"
