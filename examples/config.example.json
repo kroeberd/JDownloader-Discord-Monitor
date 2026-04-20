@@ -1,0 +1,54 @@
+{
+  "locale": "en",
+  "timezone": "Europe/Berlin",
+  "onboarding_completed": false,
+  "log_level": "INFO",
+  "credentials": {
+    "email": "me@example.com",
+    "password": "change-me"
+  },
+  "devices": [
+    {
+      "id": "device-homejd",
+      "name": "HomeJD",
+      "display_name": "Home JDownloader",
+      "enabled": true,
+      "poll_interval_seconds": 300,
+      "webhook_ids": ["webhook-default"],
+      "summary_interval_minutes": 30,
+      "quiet_hours": {
+        "enabled": false,
+        "start": "23:00",
+        "end": "07:00",
+        "timezone": "Europe/Berlin"
+      }
+    }
+  ],
+  "webhooks": [
+    {
+      "id": "webhook-default",
+      "name": "Discord Status",
+      "url": "https://discord.com/api/webhooks/xxx/yyy",
+      "enabled": true,
+      "device_ids": ["device-homejd"],
+      "theme": "modern",
+      "locale": "en",
+      "branding": {
+        "username": "JDownloader Monitor",
+        "avatar_url": null
+      },
+      "customization": {
+        "accent_color": "#58a6ff",
+        "accent_icon": "satellite",
+        "compact": false,
+        "verbose": true,
+        "show_device_details": true,
+        "show_transfer_stats": true,
+        "show_recent_files": true,
+        "show_connection_badge": true
+      },
+      "notification_modes": ["summary", "started", "completed", "offline"],
+      "throttle_seconds": 180
+    }
+  ]
+}

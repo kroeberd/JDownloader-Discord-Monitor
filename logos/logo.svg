@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="title desc">
+  <title id="title">JDownloader Monitor Logo</title>
+  <desc id="desc">A radar-inspired monitor icon with a download arrow core and Discord status pulse accents.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="75%">
+      <stop offset="0%" stop-color="#162236"/>
+      <stop offset="100%" stop-color="#0a1018"/>
+    </radialGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff9c5b" stop-opacity="0.35"/>
+      <stop offset="55%" stop-color="#ff7a30" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#ff7a30" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffb36a"/>
+      <stop offset="100%" stop-color="#ff6b2f"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#72b8ff"/>
+      <stop offset="100%" stop-color="#4e8dff"/>
+    </linearGradient>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="168" fill="url(#glow)"/>
+
+  <circle cx="256" cy="256" r="188" fill="none" stroke="#ff7e36" stroke-opacity="0.18" stroke-width="2"/>
+  <circle cx="256" cy="256" r="152" fill="none" stroke="#ff7e36" stroke-opacity="0.56" stroke-width="3"/>
+  <circle cx="256" cy="256" r="114" fill="none" stroke="#ff9d63" stroke-opacity="0.92" stroke-width="4"/>
+
+  <path d="M256 256 L256 104 A152 152 0 0 1 388 181 Z" fill="#ff8a43" fill-opacity="0.14"/>
+  <path d="M256 256 L256 104 A152 152 0 0 1 372 158 Z" fill="#ff9d63" fill-opacity="0.1"/>
+
+  <line x1="256" y1="76" x2="256" y2="146" stroke="#ff9b61" stroke-width="5" stroke-linecap="round"/>
+  <line x1="256" y1="366" x2="256" y2="436" stroke="#ff9b61" stroke-width="5" stroke-linecap="round"/>
+  <line x1="76" y1="256" x2="146" y2="256" stroke="#ff9b61" stroke-width="5" stroke-linecap="round"/>
+  <line x1="366" y1="256" x2="436" y2="256" stroke="#ff9b61" stroke-width="5" stroke-linecap="round"/>
+
+  <circle cx="256" cy="76" r="6" fill="#ff9b61"/>
+  <circle cx="256" cy="436" r="6" fill="#ff9b61"/>
+  <circle cx="76" cy="256" r="6" fill="#ff9b61"/>
+  <circle cx="436" cy="256" r="6" fill="#ff9b61"/>
+
+  <line x1="256" y1="256" x2="376" y2="172" stroke="url(#accent)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+
+  <circle cx="256" cy="256" r="38" fill="#ff7d35" fill-opacity="0.18" filter="url(#softGlow)"/>
+  <circle cx="256" cy="256" r="22" fill="#ffffff" fill-opacity="0.98"/>
+  <circle cx="256" cy="256" r="15" fill="url(#accent)"/>
+
+  <path d="M256 214 v42" stroke="#ffffff" stroke-width="12" stroke-linecap="round"/>
+  <path d="M234 248 l22 28 22-28" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="338" cy="198" r="10" fill="url(#blue)"/>
+  <circle cx="356" cy="184" r="6" fill="#9ac8ff" fill-opacity="0.9"/>
+  <circle cx="374" cy="170" r="4" fill="#c6ddff" fill-opacity="0.82"/>
+</svg>

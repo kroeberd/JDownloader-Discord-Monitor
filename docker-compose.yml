@@ -1,12 +1,17 @@
-version: "3.8"
 services:
-  jd-discord-status:
-    image: ghcr.io/kroeberd/Jdownloader-discord-monitor:latest
-    container_name: jd-discord-status
+  jd-monitor:
+    build: .
+    container_name: jd-monitor
+    ports:
+      - "8080:8080"
     environment:
-      WEBHOOK_URL: "https://discord.com/api/webhooks/xxx/yyy"
-      MYJD_EMAIL: "me@example.com"
-      MYJD_PASSWORD: "meinpasswort"
-      MYJD_DEVICES: "HomeJD,ServerJD"
-      INTERVAL: 600
+      JD_MONITOR_DATA_DIR: /data
+      MYJD_EMAIL: me@example.com
+      MYJD_PASSWORD: change-me
+      MYJD_DEVICES: HomeJD,ServerJD
+      WEBHOOK_URL: https://discord.com/api/webhooks/xxx/yyy
+      LANG: en
+      INTERVAL: "300"
+    volumes:
+      - ./data:/data
     restart: unless-stopped

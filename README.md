@@ -1,122 +1,138 @@
-# ![J[Downloader Logo](# !](https://raw.githubusercontent.com/kroeberd/JDownloader-Discord-Monitor/refs/heads/main/logos/logo_big_JM_400_300.jpg) 
- # JDownloader-Docker-Monitor
- 
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
+<div align="center">
 
-**JDownloader-Docker-Monitor** monitors one or more JDownloader instances via **MyJDownloader** and sends periodic **Discord updates** as rich embeds.
+<img src="logos/logo.svg" width="128" alt="JDownloader Monitor logo"/>
 
----
+# JDownloader Monitor
 
-# Screenshot
+[![Version](https://img.shields.io/badge/version-v0.0.1-ff7b32)](https://github.com/kroeberd/jdownloader-discord-monitor/releases)
+[![License](https://img.shields.io/badge/license-GPL--3.0-4e8dff)](LICENSE)
 
-## English version
-<img width="516" height="714" alt="image" src="https://github.com/user-attachments/assets/bf011195-9c02-48a2-a86c-a32e13f6932e" />
+</div>
 
+`v0.0.1` is the clean rebuilt foundation of the original monitor: a production-oriented self-hosted application with a modern GUI, persistent configuration, reliable polling, health endpoints, and a flexible Discord theme system.
 
-## German version
-<img width="525" height="740" alt="image" src="https://github.com/user-attachments/assets/f4b25c5d-dafe-4c5f-9763-5cc3317bb76e" />
+## Existing Repository Analysis
 
----
+The previous implementation was a compact proof of concept:
 
-## 🌟 Features
+- Runtime flow: `app.py` loaded env vars, logged into MyJDownloader, polled device links in a loop, derived a few counters, and posted a Discord embed on every cycle.
+- Strengths worth preserving: the product idea, Docker-first distribution, MyJDownloader integration, multilingual intent, and a simple self-hosting story.
+- Major weaknesses: all logic in one file, no persistence, no GUI, direct network calls without proper retry discipline, no structured logging, no health endpoints, no webhook dedupe across restarts, no config validation, and no clear extension point for templates or multiple webhook layouts.
+- Reliability risks: token expiry only handled in one narrow path, no timeout strategy around Discord calls, no backoff policy, no audit trail, no quiet hours or throttling, and startup state loss causing duplicate notifications after restart.
+- UX limitations: env vars only, no onboarding, no preview, no webhook management, no device overview, no logs page, and no operator-friendly validation.
 
-- ✅ Monitor multiple JDownloader devices simultaneously  
-- ✅ Display active downloads, progress, speed, and filenames  
-- ✅ Discord embeds with colors, emojis, and footer logo  
-- ✅ Configurable interval between updates  
-- ✅ Automatic hiding of unavailable fields  
-- ✅ Works with Docker, Docker Compose, and Unraid
-- ✅ Multilingual, english or german
+That analysis led to a clean rebuild instead of an incremental refactor.
 
----
+## Architecture
 
-## 📊 Status Messages
+The new structure separates concerns into testable layers:
 
-Each Discord embed may include:
+- `jd_monitor/services/myjd.py`: MyJDownloader integration and normalization.
+- `jd_monitor/services/poller.py`: background polling, defensive retry/backoff behavior, and event classification.
+- `jd_monitor/services/themes.py`: Discord rendering and preview generation for built-in themes.
+- `jd_monitor/services/notifications.py`: webhook delivery, dedupe, retry handling, and audit persistence.
+- `jd_monitor/repo_utils.py` + `jd_monitor/db.py`: SQLite-backed config, device state, and notification history.
+- `jd_monitor/api.py`: FastAPI routes for GUI, preview, test-send, logs, dashboard data, and health.
+- `jd_monitor/templates` + `jd_monitor/static`: server-rendered modern web UI.
 
-| Field | Description |
-|-------|-------------|
-| 📥 Active downloads | Number of ongoing downloads |
-| ⚡ Speed | Current download speed |
-| ⏱️ Progress | Percentage completed |
-| 💾 Data | Downloaded / Total size in GB |
-| 🖥️ Device info | JDownloader version and platform |
-| 🗂️ Filenames | Up to 5 filenames in the queue |
+### Why FastAPI + server-rendered UI
 
----
+FastAPI gives typed models, clean API boundaries, and lightweight async background work. The frontend is server-rendered HTML with custom JS/CSS instead of a Node build pipeline because this keeps Docker deployment smaller and simpler for self-hosters while still delivering a modern interactive GUI.
 
-## ⚙️ Environment Variables
+## Features
 
-| Variable       | Description |
-|----------------|-------------|
-| `WEBHOOK_URL`  | Discord webhook URL for status messages |
-| `MYJD_EMAIL`    | Email of your MyJDownloader account |
-| `MYJD_PASSWORD` | Password for your MyJDownloader account |
-| `MYJD_DEVICES`  | Comma-separated device names (e.g., `HomeJD,ServerJD`) |
-| `INTERVAL`      | Interval in seconds between updates (default: `300`) |
-| `LANG`      | `en` for englisch, `de` for german  |
+- Dashboard with health, device status, and audit history
+- Persistent config storage in SQLite
+- Multiple devices and multiple Discord webhooks
+- Per-webhook theme selection
+- Built-in themes: `minimal`, `modern`, `compact`, `detailed`, `status-card`, `high-contrast`, `homelab`
+- Discord preview before saving
+- Test-send button
+- Structured JSON logging
+- Health endpoints for container orchestration
+- Legacy env-var bootstrap for first-run migration
+- Docker and Docker Compose deployment
 
+## GUI Pages
 
----
+The rebuilt UI includes:
 
-## 🐳 Docker
+- Dashboard/home
+- Device management
+- Webhook/theme management
+- Preview/test-send workspace
+- Logs view
+- Settings and connection page
 
-### Run with Docker
+## Quick Start
 
-```bash
-docker run -d \
-  --name JDownloader-Docker-Monitor \
-  -e WEBHOOK_URL="https://discord.com/api/webhooks/xxx/yyy" \
-  -e MYJD_EMAIL="me@example.com" \
-  -e MYJD_PASSWORD="myPassword" \
-  -e MYJD_DEVICES="HomeJD,ServerJD" \
-  -e INTERVAL=600 \
-  -e LANG=en \
-  ghcr.io/kroeberd/jdownloader-discord-monitor:latest
-```
-
----
-
-## 🖥️ Unraid
-Example Unraid container configuration:
-```xml
-<Container>
-  <Name>JDownloader-Docker-Monitor</Name>
-  <Repository>ghcr.io/kroeberd/jdownloader-discord-monitor:latest</Repository>
-  <Network>bridge</Network>
-  <EnvVars>
-    <EnvVar><Key>WEBHOOK_URL</Key><Value>https://discord.com/api/webhooks/xxx/yyy</Value></EnvVar>
-    <EnvVar><Key>MYJD_EMAIL</Key><Value>me@example.com</Value></EnvVar>
-    <EnvVar><Key>MYJD_PASSWORD</Key><Value>myPassword</Value></EnvVar>
-    <EnvVar><Key>MYJD_DEVICES</Key><Value>HomeJD,ServerJD</Value></EnvVar>
-    <EnvVar><Key>INTERVAL</Key><Value>600</Value></EnvVar>
-    <EnvVar><Key>LANG</Key><Value>en</Value></EnvVar>
-  </EnvVars>
-  <RestartPolicy>unless-stopped</RestartPolicy>
-</Container>
-
-```
-
----
-
-## 🐙 Docker-Compose
+### Docker Compose
 
 ```yaml
-version: "3.8"
 services:
-  JDownloader-Docker-Monitor:
-    image: ghcr.io/kroeberd/jdownloader-discord-monitor:latest
-    container_name: JDownloader-Docker-Monitor
+  jd-monitor:
+    build: .
+    ports:
+      - "8080:8080"
     environment:
-      WEBHOOK_URL: "https://discord.com/api/webhooks/xxx/yyy"
-      MYJD_EMAIL: "me@example.com"
-      MYJD_PASSWORD: "myPassword"
-      MYJD_DEVICES: "HomeJD,ServerJD"
-      INTERVAL: 600
+      JD_MONITOR_DATA_DIR: /data
+      MYJD_EMAIL: me@example.com
+      MYJD_PASSWORD: change-me
+      MYJD_DEVICES: HomeJD,ServerJD
+      WEBHOOK_URL: https://discord.com/api/webhooks/xxx/yyy
+      INTERVAL: "300"
       LANG: en
+    volumes:
+      - ./data:/data
     restart: unless-stopped
 ```
----
 
-## Thanks to
-> Shadow_the_Vulpz (Discord) for the Logos.
+Open [http://localhost:8080](http://localhost:8080).
+
+### Local Development
+
+```bash
+python -m venv .venv
+. .venv/bin/activate
+pip install -e .[dev]
+uvicorn jd_monitor.main:app --reload --port 8080
+```
+
+## Configuration
+
+- Persistent app config is stored in SQLite under `JD_MONITOR_DATA_DIR`.
+- A typed example config is available at `examples/config.example.json`.
+- On first run, old env vars like `WEBHOOK_URL`, `MYJD_EMAIL`, `MYJD_PASSWORD`, `MYJD_DEVICES`, `INTERVAL`, and `LANG` are imported into the new config automatically.
+
+## Health and Observability
+
+- `GET /health/live`
+- `GET /health/ready`
+- JSON logs written to `/data/app.log`
+- Notification audit stored in SQLite and surfaced in the dashboard
+
+## Migration Notes
+
+From the old version to `v2`:
+
+1. Keep your existing `MYJD_EMAIL`, `MYJD_PASSWORD`, `MYJD_DEVICES`, `WEBHOOK_URL`, `INTERVAL`, and `LANG` variables for the first startup.
+2. Start the new container once; the app will create a default typed configuration from those values.
+3. Open the GUI and refine devices, webhooks, themes, and notification behavior.
+4. After saving in the UI, you can gradually move away from env-only configuration.
+
+## Major Decisions
+
+- Rebuild instead of refactor: the previous code was too coupled to evolve safely into a production app.
+- SQLite for self-hosting: simple, durable, and easy to back up.
+- Server-rendered frontend: modern enough for this product, but much simpler to deploy than a separate Node build stack.
+- Webhook themes as data-driven renderers: new templates can be added without touching the poller core.
+- Persistent audit and dedupe: avoids restart spam and improves operability.
+
+## Quality
+
+Run checks locally with:
+
+```bash
+python -m compileall jd_monitor
+pytest
+```

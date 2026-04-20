@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title }}</title>
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img class="brand-logo" src="/static/logo.svg" alt="JDownloader Monitor logo">
+        <div>
+          <h1>JDownloader Monitor</h1>
+          <p>Self-hosted Discord status control center</p>
+        </div>
+      </div>
+      <nav>
+        <button data-section="dashboard" class="nav-item active">Dashboard</button>
+        <button data-section="devices" class="nav-item">Devices</button>
+        <button data-section="webhooks" class="nav-item">Webhooks</button>
+        <button data-section="preview" class="nav-item">Preview</button>
+        <button data-section="logs" class="nav-item">Logs</button>
+        <button data-section="settings" class="nav-item">Settings</button>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Production-ready rebuild</p>
+          <h2>Reliable monitoring, themed Discord output, and an operator-friendly UI.</h2>
+        </div>
+        <div class="hero-actions">
+          <button id="save-config" class="button primary">Save configuration</button>
+          <button id="run-now" class="button">Run poll now</button>
+        </div>
+      </header>
+
+      <section id="dashboard" class="panel active">
+        <div class="grid metrics" id="metric-cards"></div>
+        <div class="split">
+          <div class="card">
+            <div class="card-header">
+              <h3>Current device status</h3>
+              <span id="health-badge" class="badge">Loading</span>
+            </div>
+            <div id="device-cards" class="stack"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Notification audit</h3>
+            </div>
+            <div id="audit-list" class="stack compact"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="devices" class="panel">
+        <div class="card">
+          <div class="card-header">
+            <h3>Configured devices</h3>
+            <button id="add-device" class="button">Add device</button>
+          </div>
+          <div id="devices-editor" class="stack"></div>
+        </div>
+      </section>
+
+      <section id="webhooks" class="panel">
+        <div class="card">
+          <div class="card-header">
+            <h3>Discord webhooks</h3>
+            <button id="add-webhook" class="button">Add webhook</button>
+          </div>
+          <div id="webhooks-editor" class="stack"></div>
+        </div>
+      </section>
+
+      <section id="preview" class="panel">
+        <div class="split">
+          <div class="card">
+            <div class="card-header">
+              <h3>Theme preview</h3>
+            </div>
+            <div class="form-grid">
+              <label>
+                Preview webhook
+                <select id="preview-webhook"></select>
+              </label>
+              <label>
+                Event mode
+                <select id="preview-event">
+                  <option value="summary">Summary</option>
+                  <option value="started">Started</option>
+                  <option value="completed">Completed</option>
+                  <option value="idle">Idle</option>
+                  <option value="offline">Offline</option>
+                  <option value="error">Error</option>
+                </select>
+              </label>
+            </div>
+            <div class="hero-actions">
+              <button id="refresh-preview" class="button primary">Refresh preview</button>
+              <button id="test-webhook" class="button">Send test</button>
+            </div>
+            <pre id="preview-json" class="code-block"></pre>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Discord output</h3>
+            </div>
+            <div id="preview-html"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="logs" class="panel">
+        <div class="card">
+          <div class="card-header">
+            <h3>Recent logs</h3>
+          </div>
+          <div id="log-lines" class="stack compact"></div>
+        </div>
+      </section>
+
+      <section id="settings" class="panel">
+        <div class="split">
+          <div class="card">
+            <div class="card-header">
+              <h3>Connection</h3>
+            </div>
+            <div class="form-grid">
+              <label>Email <input id="credentials-email" type="email"></label>
+              <label>Password <input id="credentials-password" type="password"></label>
+              <label>Locale
+                <select id="locale">
+                  <option value="en">English</option>
+                  <option value="de">Deutsch</option>
+                </select>
+              </label>
+              <label>Timezone <input id="timezone" type="text" placeholder="Europe/Berlin"></label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Operational notes</h3>
+            </div>
+            <ul class="notes">
+              <li>The UI stores configuration and dedupe state in SQLite under the mounted data directory.</li>
+              <li>Legacy environment variables are auto-migrated on first start.</li>
+              <li>Webhook preview and test-send use the same rendering pipeline as live notifications.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    window.__THEMES__ = {{ themes | tojson }};
+  </script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

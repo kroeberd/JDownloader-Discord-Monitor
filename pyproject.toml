@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jdownloader-discord-monitor"
+version = "0.0.1"
+description = "Production-ready JDownloader to Discord monitor with web UI, theming, and reliable polling."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "GPL-3.0-only" }
+authors = [{ name = "kroeberd" }]
+dependencies = [
+  "fastapi>=0.115,<1.0",
+  "uvicorn[standard]>=0.30,<1.0",
+  "jinja2>=3.1,<4.0",
+  "httpx>=0.27,<1.0",
+  "myjdapi>=1.1.7",
+  "pydantic>=2.8,<3.0",
+  "pydantic-settings>=2.3,<3.0",
+  "sqlalchemy>=2.0,<3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2,<9.0",
+  "ruff>=0.5,<1.0",
+]
+
+[tool.setuptools]
+packages = ["jd_monitor", "jd_monitor.services"]
+
+[tool.setuptools.package-data]
+jd_monitor = ["templates/*.html", "static/css/*.css", "static/js/*.js", "static/*.svg"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008", "UP047"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
