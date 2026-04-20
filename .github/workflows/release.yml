@@ -66,7 +66,7 @@ jobs:
         with:
           images: |
             ghcr.io/kroeberd/jdownloader-discord-monitor
-            kroeberd/jdownloader-discord-monitor
+            kroeberd/jdownloader-docker-monitor
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
