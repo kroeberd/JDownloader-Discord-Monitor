@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
@@ -8,9 +9,14 @@ from myjdapi import Myjdapi
 
 from jd_monitor.schemas import DeviceConfig, DeviceSnapshot, DownloadEntry, TransferTotals
 
+logger = logging.getLogger("jd_monitor.myjd")
+
 
 class MyJdError(Exception):
-    pass
+    def __init__(self, safe_message: str, debug_message: str | None = None) -> None:
+        super().__init__(safe_message)
+        self.safe_message = safe_message
+        self.debug_message = debug_message or safe_message
 
 
 class InvalidCredentialsError(MyJdError):
@@ -39,8 +45,11 @@ class MyJDownloaderService:
         except Exception as exc:  # pragma: no cover - external library
             message = str(exc).upper()
             if "AUTH" in message or "LOGIN" in message:
-                raise InvalidCredentialsError(str(exc)) from exc
-            raise MyJdError(str(exc)) from exc
+                raise InvalidCredentialsError(
+                    "Authentication with MyJDownloader failed.",
+                    str(exc),
+                ) from exc
+            raise MyJdError(self._safe_error_message(exc), str(exc)) from exc
         self._connected = True
         self._email = email
         self._password = password
@@ -58,8 +67,11 @@ class MyJDownloaderService:
                 await self.connect(email, password)
                 return await self.fetch_snapshot(email, password, device)
             if "AUTH" in text or "LOGIN" in text:
-                raise InvalidCredentialsError(str(exc)) from exc
-            raise MyJdError(str(exc)) from exc
+                raise InvalidCredentialsError(
+                    "Authentication with MyJDownloader failed.",
+                    str(exc),
+                ) from exc
+            raise MyJdError(self._safe_error_message(exc), str(exc)) from exc
 
         totals = self._build_totals(links, state, device.poll_interval_seconds)
         recent = [
@@ -108,6 +120,19 @@ class MyJDownloaderService:
             return int(value) if value is not None else None
         except (TypeError, ValueError):
             return None
+
+    @staticmethod
+    def _safe_error_message(exc: Exception) -> str:
+        if isinstance(exc, UnicodeDecodeError):
+            return "MyJDownloader returned unreadable device data."
+        message = str(exc).upper()
+        if "TOKEN_INVALID" in message:
+            return "The MyJDownloader session expired and is being refreshed."
+        if "TIMEOUT" in message:
+            return "The device did not respond in time."
+        if "DEVICE" in message and "NOT" in message and "FOUND" in message:
+            return "The configured JDownloader device could not be found."
+        return "The JDownloader device is currently unavailable."
 
     def _build_totals(self, links: list[dict], state: PollState, interval: int) -> TransferTotals:
         done_bytes = sum(int(item.get("bytesLoaded", 0) or 0) for item in links)

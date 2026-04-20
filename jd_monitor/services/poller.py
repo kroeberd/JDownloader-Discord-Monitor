@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from datetime import datetime, timedelta
 
 from jd_monitor.repo_utils import ConfigRepository, DeviceStateRepository, NotificationRepository
@@ -8,6 +9,8 @@ from jd_monitor.schemas import AppConfig, DeviceConfig, DeviceSnapshot, HealthSt
 from jd_monitor.services.events import classify_event
 from jd_monitor.services.myjd import InvalidCredentialsError, MyJdError, MyJDownloaderService
 from jd_monitor.services.notifications import NotificationService
+
+logger = logging.getLogger("jd_monitor.poller")
 
 
 class PollerService:
@@ -79,10 +82,18 @@ class PollerService:
         except InvalidCredentialsError as exc:
             snapshot = self._offline_snapshot(device, "invalid_credentials", str(exc), previous)
             self.health = HealthStatus(status="error", message="Invalid MyJDownloader credentials")
+            logger.warning(
+                "MyJDownloader authentication failed",
+                extra={"extra": {"device_id": device.id, "error": exc.debug_message}},
+            )
             backoff_seconds = min(device.poll_interval_seconds * 2, 900)
         except MyJdError as exc:
             snapshot = self._offline_snapshot(device, "offline", str(exc), previous)
             self.health = HealthStatus(status="degraded", message="MyJDownloader connectivity issues")
+            logger.warning(
+                "MyJDownloader device poll failed",
+                extra={"extra": {"device_id": device.id, "error": exc.debug_message}},
+            )
             backoff_seconds = min(device.poll_interval_seconds * 2, 900)
 
         self.device_repo.save(snapshot)
